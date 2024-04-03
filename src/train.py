@@ -23,9 +23,11 @@ def main() -> None:
 
     running_loss = []
     for epoch in range(EPOCHS):
-        for data, target in trainloader:
-            print(data)
-            print(target)
+    
+        
+        #for data, target in trainloader:
+        #    x = data.to(device)
+            
 
 if __name__ == "__main__":
     main()
