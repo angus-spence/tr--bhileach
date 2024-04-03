@@ -24,9 +24,8 @@ def main() -> None:
     running_loss = []
     for epoch in range(EPOCHS):
         for data, target in trainloader:
-            print(data[0])
+            print(data)
             print(target)
-            
 
 if __name__ == "__main__":
     main()
