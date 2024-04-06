@@ -12,40 +12,29 @@ root = os.path.join(os.getcwd(), 'src/data/')
 
 @dataclass	
 class CosineTripletMiner:
-    data: torch.utils.data.Dataset
-    dataloader: torch.utils.data.DataLoader
-    root: str
-    train: bool = True
-    download: bool = True
-    batch_size: int = 1024
-    transform: tv.transforms.Compose = tv.transforms.ToTensor()
-
+    difficulty: float = 0.5
+    
     def __post_init__(self):
-        self.data(root=self.root, 
-                  train=self.train, 
-                  download=self.download, 
-                  transform=self.transform)
-        self.dataloader(dataset=self.data,
-                        batch_size=self.batch_size,
-                        shuffle=True)
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         self.coss = torch.nn.CosineSimilarity(dim=1, eps=1e-6)
 
-    def _cosine_similarity(self) -> np.ndarray:
-        cos_sim = np.zeros((self.batch_size, self.batch_size))
-        for x, x_trgt in self.dataloader:
-            for i in self.batch_size:
-                for j in self.batch_size:
-                    cos_sim[i, j] = self.coss(x[i], x[j])
-            plt.matshow(cos_sim)
-            plt.show()
-
-    def __call__(self, targets: list) -> Union[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def __call__(self, batch) -> np.ndarray:
+        matx = self._cosine_similarity_matrix(batch)
+        idx_match = self._miner(matx)
         return
     
+    def _cosine_similarity_matrix(self, batch) -> np.ndarray:
+        n = batch.shape[0]
+        cos_sim = np.zeros((n, n))
+        x = batch.to(self.device)
+        for i in range(n):
+            for j in range(n):
+                cos_sim[i, j] = np.sqrt(np.mean(self.coss(x[i], x[j]).cpu().numpy()**2))
+        return cos_sim
+
+    def _miner(self, cos_sim_matrix: np.ndarray) -> np.ndarray:
+        for i in range(cos_sim_matrix.shape[1]):
+            #TODO: Implement miner
+
 if __name__ == "__main__":
-    miner = CosineTripletMiner(data=tv.datasets.MNIST,
-                               dataloader=torch.utils.data.DataLoader, 
-                               root=root)
-    miner._cosine_similarity()
-    print(miner.device)
+    miner = CosineTripletMiner(difficulty=0.5)
