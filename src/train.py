@@ -13,7 +13,7 @@ def main() -> None:
     train = datasets.MNIST(root=root, train=True, download=True, transform=transforms.ToTensor())
     test = datasets.MNIST(root=root, train=False, download=True)
 
-    trainloader = torch.utils.data.DataLoader(train, batch_size=64, shuffle=True)
+    trainloader = torch.utils.data.DataLoader(train, batch_size=128, shuffle=True)
     if torch.cuda.is_available(): device = torch.device('cuda')
     else: device = torch.device('cpu') 
     
